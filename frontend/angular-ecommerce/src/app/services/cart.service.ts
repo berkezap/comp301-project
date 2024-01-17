@@ -14,25 +14,19 @@ export class CartService {
   constructor() {}
 
   addToCart(theCartItem: CartItem) {
-    let alreadyExistsInCart: boolean = false;
-    let existingCartItem: CartItem = undefined;
+    let existingCartItem = this.cartItems.find(
+      (item) => item.id === theCartItem.id
+    );
 
-    if (this.cartItems.length > 0) {
-      for (let tempCartItem of this.cartItems) {
-        if (tempCartItem.id === theCartItem.id) {
-          existingCartItem = tempCartItem;
-          break;
-        }
-      }
-      alreadyExistsInCart = existingCartItem != undefined;
-    }
-    if (alreadyExistsInCart) {
+    if (existingCartItem) {
       existingCartItem.quantity++;
     } else {
       this.cartItems.push(theCartItem);
     }
+
     this.computeCartTotals();
   }
+
   computeCartTotals() {
     let totalPriceValue: number = 0;
     let totalQuantityValue: number = 0;
@@ -41,19 +35,25 @@ export class CartService {
       totalPriceValue += currentCartItem.quantity * currentCartItem.unitPrice;
       totalQuantityValue += currentCartItem.quantity;
     }
+
     this.totalPrice.next(totalPriceValue);
     this.totalQuantity.next(totalQuantityValue);
 
     this.logCartData(totalPriceValue, totalQuantityValue);
   }
+
   logCartData(totalPriceValue: number, totalQuantityValue: number) {
     console.log('Sepettekiler');
     for (let tempCartItem of this.cartItems) {
       const subTotalPrice = tempCartItem.quantity * tempCartItem.unitPrice;
       console.log(
-        `name: ${tempCartItem.name}, quantity = ${tempCartItem.quantity}, unitPrice= ${tempCartItem.unitPrice} , subTotalPrice= ${subTotalPrice} `
+        `name: ${tempCartItem.name}, quantity = ${tempCartItem.quantity}, unitPrice= ${tempCartItem.unitPrice}, subTotalPrice= ${subTotalPrice}`
       );
     }
-    console.log(`totalPrice: ${totalPriceValue.toFixed(2)}, totalQuantity: ${totalQuantityValue}`)
+    console.log(
+      `totalPrice: ${totalPriceValue.toFixed(
+        2
+      )}, totalQuantity: ${totalQuantityValue}`
+    );
   }
 }
